@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
@@ -15,6 +16,7 @@ class Post extends Model
 
     protected $fillable = [
         'title',
+        'user_id',
         'slug',
         'content',
         'image_path',
@@ -30,6 +32,7 @@ class Post extends Model
     {
 
         $user['title'] = htmlspecialchars_decode($input['title'] ?? null);
+        $user['user_id'] = Auth::user()->id;
         //$user['slug'] = htmlspecialchars_decode($input['slug'] ?? null);
         $user['content'] = htmlspecialchars_decode($input['content'] ?? null);
 
@@ -62,7 +65,7 @@ class Post extends Model
             $query->orderBy($input['order_by'], $input['direction']??'asc');
         }
 
-        return $query->paginate($per_page);
+        return $query->where('user_id', Auth::user()->id)->paginate($per_page);
 
     }
 
